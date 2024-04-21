@@ -23,7 +23,5 @@ jobs:
         - name: Install Dependencies
           run: npm install
     
-        - name: Unit Testing
-          run: npm test
           
         

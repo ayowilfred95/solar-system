@@ -10,13 +10,19 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "/")));
 app.use(cors());
 
-mongoose.connect("mongodb+srv://ayowilfred:metropolitan95@cluster0.uhwgu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0").then(()=>{
-    app.listen(3000, () => {
-        console.log("Server successfully running on port - " + 3000);
-      });
-}).catch((error)=>{
-    console.log("Error connecting to database",error)
-})
+
+mongoose.connect(
+    "mongodb+srv://ayowilfred:metropolitan95@cluster0.uhwgu.mongodb.net/",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    }
+  ).then(() => {
+    console.log("Database connected successfully");
+  }).catch((err) => {
+    console.log("Error connecting to database", err);
+  });
+
 
 var Schema = mongoose.Schema;
 
@@ -31,25 +37,24 @@ var dataSchema = new Schema({
 var planetModel = mongoose.model("planets", dataSchema);
 
 app.post("/planet", function (req, res) {
-    planetModel.findOne(
-      {
-        id: req.body.id,
-      },
-      function (err, planetData) {
-        if (err) {
-          console.error("Error finding planet data:", err);
-          res.status(500).send("Error finding planet data");
+  planetModel.findOne(
+    {
+      id: req.body.id,
+    },
+    function (err, planetData) {
+      if (err) {
+        console.error("Error finding planet data:", err);
+        res.status(500).send("Error finding planet data");
+      } else {
+        if (!planetData) {
+          res.status(404).send("Planet not found");
         } else {
-          if (!planetData) {
-            res.status(404).send("Planet not found");
-          } else {
-            res.send(planetData);
-          }
+          res.send(planetData);
         }
       }
-    );
-  });
-  
+    }
+  );
+});
 
 app.get("/", async (req, res) => {
   res.sendFile(path.join(__dirname, "/", "index.html"));
@@ -77,6 +82,12 @@ app.get("/ready", function (req, res) {
   });
 });
 
-
+app.listen(3000, () => {
+  console.log("Server successfully running on port - " + 3000);
+});
 
 module.exports = app;
+
+
+
+
